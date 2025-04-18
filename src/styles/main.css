@@ -188,20 +188,19 @@ body, html {
 /* Game Over Box */
 
 .game-over-box {
-  width: 100vw;
-  height: 100vh;
-  padding: 25px 20px;
-  background: #111;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  border: 2px solid #ff4c4c; 
-  box-shadow: 0 0 30px #ff4c4c80;
-  border-radius: 15px;
-  overflow-y: auto;
-  gap: 10px;
+  position: absolute; /* Ensure it's absolutely positioned to not block the layout */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 15px #f00a;
+  display: none; /* Hide initially */
+  z-index: 1000;
 }
 
 
