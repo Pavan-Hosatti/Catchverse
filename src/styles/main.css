@@ -300,7 +300,6 @@ button:hover, .start-button:hover {
   transform: scale(1.2);
 }
 
-
 @media screen and (max-width: 600px) {
   .falling-item {
     width: 40px;
@@ -323,7 +322,7 @@ button:hover, .start-button:hover {
     font-size: 18px;
   }
 
-  /* PAGE 1: Name Form */
+  /* ========== PAGE 1: Name Form ========== */
   .name-form {
     width: 100vw;
     height: 100vh;
@@ -358,7 +357,7 @@ button:hover, .start-button:hover {
     width: 80%;
   }
 
-  /* PAGE 2: Instructions */
+  /* ========== PAGE 2: Instructions ========== */
   .instructions-box {
     width: 95vw;
     height: 90vh;
@@ -366,7 +365,7 @@ button:hover, .start-button:hover {
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-evenly; 
     align-items: flex-start;
     border: 2px solid #00ff88;
     box-shadow: 0 0 15px #00ff8880;
@@ -406,7 +405,7 @@ button:hover, .start-button:hover {
     margin-bottom: 30px;
   }
 
-  /* PAGE 3: Game Over */
+  /* ========== PAGE 3: Game Over ========== */
   .game-over-box {
     width: 100vw;
     height: 100vh;
@@ -414,7 +413,7 @@ button:hover, .start-button:hover {
     background: #111;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: flex-start; /* Fix to avoid big gap above buttons */
     align-items: center;
     color: white;
     border: 2px solid #ff4c4c;
@@ -423,6 +422,7 @@ button:hover, .start-button:hover {
     overflow-y: auto;
     gap: 10px;
     margin: 10px;
+    flex-wrap: wrap;
   }
 
   .game-over-box h2 {
@@ -460,8 +460,9 @@ button:hover, .start-button:hover {
     flex-direction: column;
     gap: 10px;
     align-items: center;
-    margin-top: auto;
-    padding-bottom: 15px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    position: relative;
   }
 
   .game-over-buttons button {
@@ -478,9 +479,24 @@ button:hover, .start-button:hover {
   .game-over-buttons button:hover {
     background: #ff1f1f;
   }
+
+  /* Add share score button here */
+  .game-over-buttons .share-score {
+    background: #4caf50; /* Green background for share score */
+    border: none;
+    color: white;
+  }
+
+  .game-over-buttons .share-score:hover {
+    background: #45a049;
+  }
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 400px) {
+  .name-form input {
+    width: 180px;
+  }
+
   .falling-item {
     width: 35px;
     height: 35px;
@@ -510,29 +526,14 @@ button:hover, .start-button:hover {
     font-size: 14px;
     width: 85%;
   }
-
-  .game-over-box h2 {
-    font-size: 30px;
-  }
-
-  .game-over-box p {
-    font-size: 28px;
-  }
-
-  .game-over-box h3 {
-    font-size: 26px;
-  }
-
-  .game-over-box ul {
-    max-height: 150px;
-    font-size: 14px;
-  }
-
-  .game-over-buttons button {
-    font-size: 15px;
-    padding: 10px 20px;
-  }
 }
+
+  /* Buttons - Touch Optimized */
+  .name-form button, .start-button {
+    padding: 12px 24px;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
 
 
 
