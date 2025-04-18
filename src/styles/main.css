@@ -207,6 +207,10 @@ body, html {
   justify-content: center;
 }
 
+.btn{
+margin-bottom: 15px;
+}
+
 
 .game-over-box.active {
   opacity: 1;
