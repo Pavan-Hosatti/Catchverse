@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import './styles/main.css';
 import { motion } from 'framer-motion';
 
@@ -21,14 +21,25 @@ export default function App() {
   const speedFactor = useRef(1.2);
   const [isClicking, setIsClicking] = useState(false);
   const [lastClickTime, setLastClickTime] = useState(0);
+  const finalScore = useRef(0);
+  const gameOverRef = useRef(null); // For toggling active class
 
-  //  Load leaderboard from localStorage brooooo!
   useEffect(() => {
     const storedData = localStorage.getItem("catchverse-leaderboard");
     if (storedData) {
       setLeaderboard(JSON.parse(storedData));
     }
   }, []);
+
+  useLayoutEffect(() => {
+    const box = gameOverRef.current;
+    if (!box) return;
+    if (gameOver) {
+      box.classList.add('active');
+    } else {
+      box.classList.remove('active');
+    }
+  }, [gameOver]);
 
   const handleNameSubmit = () => {
     if (nameInput.trim()) {
@@ -51,14 +62,13 @@ export default function App() {
     setGameActive(false);
     setGameOver(true);
     cancelAnimationFrame(animationFrame.current);
-    finalScore.current = score; // store correct score
-  
+    finalScore.current = score;
+
     const updated = [...leaderboard, { name: playerName, score: finalScore.current }];
     updated.sort((a, b) => b.score - a.score);
     setLeaderboard(updated);
     localStorage.setItem("catchverse-leaderboard", JSON.stringify(updated));
   };
-  
 
   const getRandomBallType = () => {
     const rand = Math.random();
@@ -147,21 +157,17 @@ export default function App() {
 
   const handleShareScore = () => {
     const shareText = `🎮 I just scored ${score} points in Catchverse! Think you can beat me? 🔥`;
-  
-    // anna copy logic uu
+
     navigator.clipboard.writeText(shareText)
       .then(() => alert('Score copied! Share it with your friends 🎉'))
       .catch(() => alert('Failed to copy score. Try again!'));
-  
-    // for mobile devie share maakadde
+
     if (navigator.share) {
       navigator.share({
         title: 'Catchverse Score',
         text: shareText,
         url: window.location.href,
-      }).catch(() => {
-        
-      });
+      }).catch(() => {});
     }
   };
 
@@ -218,7 +224,7 @@ export default function App() {
       )}
 
       {gameOver && (
-        <div className="game-over-box">
+        <div className="game-over-box" ref={gameOverRef}>
           <h2>Game Over, {playerName}!</h2>
           <p>Your Score: <strong>{score}</strong></p>
           <h3>🏆 Leaderboard</h3>
@@ -246,6 +252,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
