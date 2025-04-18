@@ -203,6 +203,8 @@ body, html {
   z-index: 1000;
 }
 
+.game-over-box.active {
+  display: flex; 
 
 
 .game-over-box h2 {
