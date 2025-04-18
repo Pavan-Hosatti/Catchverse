@@ -310,7 +310,7 @@ button:hover, .start-button:hover {
     border: 2px solid #00bfff;
     box-shadow: 0 0 20px #00bfff80;
     border-radius: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 50px;
   }
 
   .name-form input {
