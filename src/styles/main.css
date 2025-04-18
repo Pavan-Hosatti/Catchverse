@@ -447,7 +447,7 @@ button:hover, .start-button:hover {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
     align-items: center;
     margin-bottom: 30px;
   }
