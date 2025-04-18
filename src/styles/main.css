@@ -340,7 +340,7 @@ button:hover, .start-button:hover {
   /* ========== PAGE 2: Instructions ========== */
   .instructions-box {
     
-    width: 90vw;
+    width: 95vw;
     height: 90vh;
     background: #1b1b1b;
     padding: 30px 20px;
@@ -383,14 +383,14 @@ button:hover, .start-button:hover {
     background-color: #00ff88;
     color: #000;
     border: none;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
   }
 
   /* ========== PAGE 3: Game Over ========== */
   .game-over-box {
     width: 100vw;
     height: 100vh;
-    padding: 25px 20px;
+    padding: 30px 25px;
     background: #111;
     display: flex;
     flex-direction: column;
@@ -435,7 +435,7 @@ button:hover, .start-button:hover {
   }
 
   .game-over-buttons {
-    margin-bottom: 20px; /* 🎯 brings buttons UP */
+  /* 🎯 brings buttons UP */
     width: 100%;
     display: flex;
     flex-direction: column;
