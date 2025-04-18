@@ -350,6 +350,7 @@ button:hover, .start-button:hover {
     color: white;
     gap: 15px;
     margin: 10px;
+    margin-bottom: 25px;
   }
 
   .instructions-box h2 {
