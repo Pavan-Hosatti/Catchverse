@@ -236,16 +236,16 @@ export default function App() {
             ))}
           </ul>
           <div className="game-over-buttons">
-            <button className="start-button play_again" onClick={() => {
+            <button className="start-button btn" onClick={() => {
               setShowInstructions(true);
               setGameOver(false);
             }}>Play Again</button>
-            <button className="start-button" onClick={() => {
+            <button className="start-button btn" onClick={() => {
               setPlayerName('');
               setShowInstructions(false);
               setGameOver(false);
             }}>Exit Game</button>
-            <button className="start-button" onClick={handleShareScore}>Share Score</button>
+            <button className="start-button btn" onClick={handleShareScore}>Share Score</button>
           </div>
         </div>
       )}
