@@ -51,12 +51,14 @@ export default function App() {
     setGameActive(false);
     setGameOver(true);
     cancelAnimationFrame(animationFrame.current);
-    const updated = [...leaderboard, { name: playerName, score }];
+    finalScore.current = score; // store correct score
+  
+    const updated = [...leaderboard, { name: playerName, score: finalScore.current }];
     updated.sort((a, b) => b.score - a.score);
     setLeaderboard(updated);
-    // ✅ Save to karlo bhai
     localStorage.setItem("catchverse-leaderboard", JSON.stringify(updated));
   };
+  
 
   const getRandomBallType = () => {
     const rand = Math.random();
@@ -244,6 +246,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
