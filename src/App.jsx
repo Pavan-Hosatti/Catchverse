@@ -245,7 +245,7 @@ export default function App() {
               setShowInstructions(false);
               setGameOver(false);
             }}>Exit Game</button>
-            <button className="start-button btn" onClick={handleShareScore}>Share Score</button>
+            <button className="start-button btn share-score" onClick={handleShareScore}>Share Score</button>
           </div>
         </div>
       )}
