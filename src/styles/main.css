@@ -420,7 +420,7 @@ button:hover, .start-button:hover {
     box-shadow: 0 0 30px #ff4c4c80;
     border-radius: 15px;
     overflow-y: auto;
-    gap: 10px;
+    gap: 2px;
     margin: 10px;
     flex-wrap: wrap;
   }
@@ -458,7 +458,7 @@ button:hover, .start-button:hover {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 2px;
     align-items: center;
     margin-top: 20px;
     padding-bottom: 20px;
@@ -482,9 +482,10 @@ button:hover, .start-button:hover {
 
   /* Add share score button here */
   .game-over-buttons .share-score {
-    background: #4caf50; /* Green background for share score */
+    background: #ff4c4c; /* Green background for share score */
     border: none;
     color: white;
+    margin-bottom:10px;
   }
 
   .game-over-buttons .share-score:hover {
