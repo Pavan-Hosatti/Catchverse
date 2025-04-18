@@ -22,13 +22,17 @@ body, html {
 
 /* Name form */
 .name-form {
-  background: #222;
-  padding: 30px;
+  width: 100vw;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #111;
+  border: 2px solid #00bfff;
+  box-shadow: 0 0 20px #00bfff80;
   border-radius: 15px;
-  box-shadow: 0 0 15px #00f6ff70;
-  text-align: center;
-  width: 100%;
-  max-width: 400px;
 }
 
 .name-form h2 {
@@ -64,17 +68,20 @@ body, html {
 
 /* Instructions Box */
 .instructions-box {
-  z-index: 9;
-  position: relative;
-  background: linear-gradient(135deg, #1c1c1c, #292929);
-  padding: 25px 30px;
+  width: 90vw;
+  height: 90vh;
+  background: #1b1b1b;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly; /* SPREADS CONTENT */
+  align-items: flex-start;
+  border: 2px solid #00ff88;
+  box-shadow: 0 0 15px #00ff8880;
   border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-  text-align: center;
-  max-width: 400px;
-  width: 100%;
-  color: #fff;
-  border: 1px solid #444;
+  color: white;
+  gap: 15px;
+  overflow-y: auto;  /* Allow scrolling if content overflows */
   animation: fadeInUp 0.6s ease;
 }
 
@@ -179,23 +186,22 @@ body, html {
 }
 
 /* Game Over Box */
+
 .game-over-box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #222;
-  padding: 30px;
-  border-radius: 20px;
-  text-align: center;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 0 15px #f00a;
+  width: 100vw;
+  height: 100vh;
+  padding: 25px 20px;
+  background: #111;
   display: flex;
   flex-direction: column;
-  max-height: 90vh; 
-  overflow: hidden;
-  margin-bottom: 25px;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  border: 2px solid #ff4c4c; 
+  box-shadow: 0 0 30px #ff4c4c80;
+  border-radius: 15px;
+  overflow-y: auto;
+  gap: 10px;
 }
 
 
@@ -327,7 +333,7 @@ button:hover, .start-button:hover {
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly; /* SPREADS CONTENT */
+    justify-content: space-evenly; 
     align-items: flex-start;
     border: 2px solid #00ff88;
     box-shadow: 0 0 15px #00ff8880;
@@ -419,6 +425,7 @@ button:hover, .start-button:hover {
     flex-direction: column;
     gap: 12px;
     align-items: center;
+    margin-bottom: 30px;
   }
 
   .game-over-buttons button {
@@ -430,6 +437,7 @@ button:hover, .start-button:hover {
     border: none;
     width: 70%;
     max-width: 250px;
+    margin-bottom: 30px;
   }
 
   .game-over-buttons button:hover {
