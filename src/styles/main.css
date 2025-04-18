@@ -207,8 +207,10 @@ body, html {
 
 
 .game-over-box.active {
-  display: flex; 
+  opacity: 1;
+  pointer-events: auto;
 }
+
 
 .game-over-box h2 {
   font-size: 50px;
