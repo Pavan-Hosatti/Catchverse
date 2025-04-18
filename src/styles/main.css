@@ -411,6 +411,7 @@ button:hover, .start-button:hover {
     overflow-y: auto;
     gap: 10px;
     margin:10px;
+    flex-wrap:wrap;
   }
 
   .game-over-box h2 {
@@ -461,7 +462,7 @@ button:hover, .start-button:hover {
     border: none;
     width: 70%;
     max-width: 250px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
 
   .game-over-buttons button:hover {
@@ -511,6 +512,7 @@ button:hover, .start-button:hover {
   .name-form button, .start-button {
     padding: 12px 24px;
     font-size: 16px;
+    margin-bottom: 5px;
   }
 
 
