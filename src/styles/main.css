@@ -211,6 +211,19 @@ body, html {
   margin-top: -30px; /* Slight upward shift */
 }
 
+.game-over-buttons {
+  position: sticky;
+  bottom: 0;
+  background: #111;
+  padding-top: 10px;
+  z-index: 5;
+}
+
+.game-over-box ul {
+  max-height: 250px; /* You can adjust */
+  overflow-y: auto;
+}
+
 .btn {
   margin-bottom: 15px;
 }
