@@ -71,7 +71,7 @@ body, html {
   width: 90vw;
   height: 90vh;
   background: #1b1b1b;
-  padding: 10px 10px;
+  padding: 30px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly; /* SPREADS CONTENT */
@@ -125,6 +125,7 @@ body, html {
   pointer-events: auto;
   position: relative;
   margin-right: 10px;
+  margin-bottom: 15px;
 }
 
 .play_again{
@@ -336,7 +337,7 @@ button:hover, .start-button:hover {
   .instructions-box {
     
     width: 90vw;
-    height: 80vh;
+    height: 90vh;
     background: #1b1b1b;
     padding: 30px 20px;
     display: flex;
@@ -348,6 +349,7 @@ button:hover, .start-button:hover {
     border-radius: 15px;
     color: white;
     gap: 15px;
+    margin: 10px;
   }
 
   .instructions-box h2 {
@@ -395,6 +397,7 @@ button:hover, .start-button:hover {
     border-radius: 15px;
     overflow-y: auto;
     gap: 10px;
+    margin:10px;
   }
 
   .game-over-box h2 {
