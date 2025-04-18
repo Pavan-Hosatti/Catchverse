@@ -336,7 +336,7 @@ button:hover, .start-button:hover {
   .instructions-box {
     
     width: 90vw;
-    height: 90vh;
+    height: 80vh;
     background: #1b1b1b;
     padding: 30px 20px;
     display: flex;
