@@ -340,7 +340,7 @@ button:hover, .start-button:hover {
 
 .level-up-popup {
   position: fixed;
-  top: 20%; /* Moved from 40% to 20% to be higher on screen */
+  top: 50%; /* Moved from 40% to 20% to be higher on screen */
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 0, 0, 0.6); /* More transparent */
@@ -349,8 +349,8 @@ button:hover, .start-button:hover {
   font-size: 1.8rem; /* Smaller font */
   font-weight: bold;
   color: white;
-  animation: pulseIn 0.3s ease-in-out; /* Reduced from 2s to 0.8s */
-  z-index: 999;
+  animation: pulseIn 0.2s ease-in-out; /* Reduced from 2s to 0.8s */
+  z-index: -999;
   text-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
   border: 5px solid yellow;
   box-shadow: 0 0 20px rgba(255, 0, 0, 0.9), 0 0 40px rgba(255, 255, 0, 0.6);
