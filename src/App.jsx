@@ -17,7 +17,8 @@ export default function App() {
   const [showHeartLost, setShowHeartLost] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
-  const [canSpawnBalls, setCanSpawnBalls] = useState(false);
+  // Initialize canSpawnBalls to true by default
+  const [canSpawnBalls, setCanSpawnBalls] = useState(true);
 
   const ballId = useRef(0);
   const animationFrame = useRef();
@@ -49,11 +50,10 @@ export default function App() {
   };
 
   const startGame = () => {
+    console.log('Starting game...');
+
     // First, ensure any existing animation is canceled
     cancelAnimationFrame(animationFrame.current);
-
-    // Disable ball spawning immediately
-    setCanSpawnBalls(false);
 
     // Make sure there are no balls at all before starting
     setBalls([]);
@@ -75,13 +75,20 @@ export default function App() {
     clickedBalls.current.clear();
     heartLostBalls.current.clear();
 
-    // Start animation immediately but without spawning balls
+    // Enable ball spawning immediately
+    setCanSpawnBalls(true);
+
+    // Start animation
     animate();
 
-    // Enable ball spawning after a delay to ensure a clean start
+    // Double-check that ball spawning is enabled after a delay
     setTimeout(() => {
-      setCanSpawnBalls(true);
-    }, 500);
+      console.log('Checking if ball spawning is enabled...');
+      if (!canSpawnBalls) {
+        console.log('Forcing ball spawning to be enabled');
+        setCanSpawnBalls(true);
+      }
+    }, 1000);
   };
 
   const endGame = () => {
@@ -142,75 +149,69 @@ export default function App() {
   };
 
   const animate = () => {
+    // Request the next animation frame first
     animationFrame.current = requestAnimationFrame(animate);
+
+    // Increment the spawn timer
     spawnTimer.current += 1;
 
-
-    // Start with a moderate base speed for easier gameplay
+    // Base speed for ball movement
     const baseSpeed = 3;
 
-    // Calculate difficulty level based on current score
-    let difficultyLevel = currentLevel;
+    // Simple spawn interval based on level
+    const spawnInterval = currentLevel <= 4 ?
+      Math.max(10, Math.floor(60 / Math.sqrt(currentLevel))) :
+      Math.max(5, Math.floor(20 / currentLevel));
 
-    // Calculate spawn interval based on difficulty level
-    let spawnInterval;
+    // Debug logging
+    console.log(`Animation frame: Score=${score}, Level=${currentLevel}, CanSpawn=${canSpawnBalls}, Timer=${spawnTimer.current}, Interval=${spawnInterval}`);
 
-    // EXTREME spawn rate changes after level 5
-    if (difficultyLevel <= 4) {
-      // Normal progression for levels 1-4
-      spawnInterval = Math.max(10, Math.floor(60 / Math.sqrt(difficultyLevel)));
-    } else {
-      // EXTREME spawn rate for levels 5+
-      // This will create a flood of balls at higher levels
-      spawnInterval = Math.max(5, Math.floor(20 / difficultyLevel));
-    }
-
-    // This creates the following spawn intervals:
-    // Level 1: 60 frames (slowest)
-    // Level 2: 42 frames
-    // Level 3: 35 frames
-    // Level 4: 30 frames
-    // Level 5: 5 frames - MASSIVE JUMP HERE!
-    // Level 6: 5 frames
-    // Level 7: 5 frames
-    // Level 8: 5 frames
-    // Level 9: 5 frames
-    // Level 10: 5 frames (maximum spawn rate)
-
-    // Log the spawn interval to console for debugging
-    console.log(`Score: ${score}, Difficulty Level: ${difficultyLevel}, Spawn Interval: ${spawnInterval}`);
-
-    // Only spawn balls if the canSpawnBalls flag is true
+    // Spawn new balls if allowed and timer reached interval
     if (canSpawnBalls && spawnTimer.current >= spawnInterval) {
       const type = getRandomBallType();
-      setBalls(prev => [...prev, { id: ballId.current++, x: getRandomX(), y: 0, type }]);
+      console.log(`Spawning a new ${type} ball`);
+
+      // Add a new ball
+      setBalls(prev => {
+        const newBalls = [...prev, { id: ballId.current++, x: getRandomX(), y: 0, type }];
+        console.log(`Balls count: ${newBalls.length}`);
+        return newBalls;
+      });
+
+      // Reset spawn timer
       spawnTimer.current = 0;
     }
 
-    setBalls(prev =>
-      prev
+    // Move existing balls down and remove those that are out of bounds
+    setBalls(prev => {
+      // Skip if no balls
+      if (prev.length === 0) return prev;
+
+      return prev
         .map(ball => ({
           ...ball,
           y: ball.y + baseSpeed * speedFactor.current,
         }))
         .filter(ball => {
+          // Check if ball is out of bounds
           if (ball.y >= window.innerHeight) {
+            // Handle white balls that cause heart loss
             if (ball.type === 'white' && !heartLostBalls.current.has(ball.id)) {
               // Mark this ball as having caused heart loss
               heartLostBalls.current.add(ball.id);
 
               setLives(l => {
                 const newLives = l - 1;
-                if (newLives < l) showHeartLostPopup(); // 🎉 show lost heart
+                if (newLives < l) showHeartLostPopup();
                 if (newLives <= 0) endGame();
                 return newLives;
               });
             }
-            return false;
+            return false; // Remove the ball
           }
-          return true;
-        })
-    );
+          return true; // Keep the ball
+        });
+    });
   };
 
   // Cleanup animation frame when component unmounts
@@ -228,6 +229,11 @@ export default function App() {
       }
     }
   }, [gameActive, gameOver]);
+
+  // Log when canSpawnBalls changes
+  useEffect(() => {
+    console.log(`canSpawnBalls changed to: ${canSpawnBalls}`);
+  }, [canSpawnBalls]);
 
   // Add a useEffect to update the speed factor when score changes
   useEffect(() => {
@@ -515,7 +521,6 @@ export default function App() {
     </div>
   );
 }
-
 
 
 
