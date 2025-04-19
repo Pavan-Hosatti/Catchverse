@@ -14,15 +14,15 @@ export default function App() {
   const [nameInput, setNameInput] = useState('');
   const [leaderboard, setLeaderboard] = useState([]);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showHeartLost, setShowHeartLost] = useState(false); // 🔥 NEW
 
   const ballId = useRef(0);
   const animationFrame = useRef();
   const spawnTimer = useRef(0);
-  const speedFactor = useRef(1.2);
-  const [isClicking, setIsClicking] = useState(false);
+  const speedFactor = useRef(1);
   const [lastClickTime, setLastClickTime] = useState(0);
   const finalScore = useRef(0);
-  const gameOverRef = useRef(null); // For toggling active class
+  const gameOverRef = useRef(null);
 
   useEffect(() => {
     const storedData = localStorage.getItem("catchverse-leaderboard");
@@ -32,12 +32,9 @@ export default function App() {
   }, []);
 
   useLayoutEffect(() => {
-    const box = gameOverRef.current;
-    if (!box) return;
-    if (gameOver) {
-      box.classList.add('active');
-    } else {
-      box.classList.remove('active');
+    if (gameOverRef.current) {
+      if (gameOver) gameOverRef.current.classList.add('active');
+      else gameOverRef.current.classList.remove('active');
     }
   }, [gameOver]);
 
@@ -77,29 +74,25 @@ export default function App() {
     else return 'green';
   };
 
+  const showHeartLostPopup = () => {
+    setShowHeartLost(true);
+    setTimeout(() => setShowHeartLost(false), 800);
+  };
+
   const animate = () => {
     animationFrame.current = requestAnimationFrame(animate);
     spawnTimer.current += 1;
-    const spawnInterval = Math.max(15, 50 - Math.floor(score / 5) * 2);
 
-    if (score > 90) speedFactor.current = 2.0;
-    else if (score > 80) speedFactor.current = 1.9;
-    else if (score > 70) speedFactor.current = 1.8;
-    else if (score > 60) speedFactor.current = 1.7;
-    else if (score > 50) speedFactor.current = 1.6;
-    else if (score > 40) speedFactor.current = 1.5;
-    else if (score > 30) speedFactor.current = 1.4;
-    else if (score > 20) speedFactor.current = 1.3;
-    else if (score > 10) speedFactor.current = 1.2;
-    else if (score > 5) speedFactor.current = 1.1;
-    else speedFactor.current = 1.0;
+    // 🔥 Adjusting speedFactor
+    const baseSpeed = 3;
+    const dynamicFactor = 0.08 * score;
+    speedFactor.current = 1 + dynamicFactor;
+
+    const spawnInterval = Math.max(15, 50 - Math.floor(score / 5) * 2);
 
     if (spawnTimer.current >= spawnInterval) {
       const type = getRandomBallType();
-      setBalls(prev => [
-        ...prev,
-        { id: ballId.current++, x: getRandomX(), y: 0, type },
-      ]);
+      setBalls(prev => [...prev, { id: ballId.current++, x: getRandomX(), y: 0, type }]);
       spawnTimer.current = 0;
     }
 
@@ -107,14 +100,16 @@ export default function App() {
       prev
         .map(ball => ({
           ...ball,
-          y: ball.y + 3 + score * 0.05 * speedFactor.current,
+          y: ball.y + baseSpeed * speedFactor.current,
         }))
         .filter(ball => {
           if (ball.y >= window.innerHeight) {
             if (ball.type === 'white') {
               setLives(l => {
-                if (l - 1 <= 0) endGame();
-                return l - 1;
+                const newLives = l - 1;
+                if (newLives < l) showHeartLostPopup(); // 🎉 show lost heart
+                if (newLives <= 0) endGame();
+                return newLives;
               });
             }
             return false;
@@ -130,10 +125,8 @@ export default function App() {
 
   const handleClick = (id, type) => {
     const currentTime = Date.now();
-    const timeDifference = currentTime - lastClickTime;
-    if (timeDifference < 200) return;
+    if (currentTime - lastClickTime < 200) return;
     setLastClickTime(currentTime);
-    setIsClicking(true);
 
     setBalls(prev => prev.filter(ball => ball.id !== id));
 
@@ -143,31 +136,19 @@ export default function App() {
       setLives(prev => Math.min(prev + 1, 5));
     } else if (type === 'red') {
       setLives(prev => {
-        if (prev - 1 <= 0) endGame();
-        return prev - 1;
+        const newLives = prev - 1;
+        if (newLives < prev) showHeartLostPopup();
+        if (newLives <= 0) endGame();
+        return newLives;
       });
     }
-
-    setTimeout(() => setIsClicking(false), 200);
-  };
-
-  const handleTouch = (id, type) => {
-    handleClick(id, type);
   };
 
   const handleShareScore = () => {
     const shareText = `🎮 I just scored ${score} points in Catchverse! Think you can beat me? 🔥`;
-
-    navigator.clipboard.writeText(shareText)
-      .then(() => alert('Score copied! Share it with your friends 🎉'))
-      .catch(() => alert('Failed to copy score. Try again!'));
-
+    navigator.clipboard.writeText(shareText).then(() => alert('Score copied!')).catch(() => {});
     if (navigator.share) {
-      navigator.share({
-        title: 'Catchverse Score',
-        text: shareText,
-        url: window.location.href,
-      }).catch(() => {});
+      navigator.share({ title: 'Catchverse Score', text: shareText, url: window.location.href }).catch(() => {});
     }
   };
 
@@ -176,13 +157,7 @@ export default function App() {
       {!playerName && (
         <div className="name-form">
           <h2>Enter Your Name</h2>
-          <input
-            type="text"
-            className="placeholder"
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-            placeholder="Type your name..."
-          />
+          <input type="text" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder="Your Name..." />
           <button onClick={handleNameSubmit}>Submit</button>
         </div>
       )}
@@ -190,12 +165,9 @@ export default function App() {
       {!gameActive && showInstructions && !gameOver && (
         <div className="instructions-box">
           <h2>🎮 Welcome, <span className="player-name">{playerName}</span>!</h2>
-          <div className="instructions-list">
-            <p>⚪ <strong>White Balls:</strong> Tap to score! (Some may need 1️⃣, 2️⃣, or even 3️⃣ clicks! but chill 3 click is very rare)</p>
-            <p>🟢 <strong>Green Balls:</strong> Catch them to gain a ❤️</p>
-            <p>🔴 <strong>Red Balls:</strong> Avoid clicking — they take away your ❤️ not just one but 2!</p>
-          </div>
-          <p className="challenge-line">Think you've got what it takes to master the chaos? 😎</p>
+          <p>⚪ Tap white balls to score</p>
+          <p>🟢 Catch green balls to gain a ❤️</p>
+          <p>🔴 Avoid red balls — they remove ❤️</p>
           <button className="start-button" onClick={startGame}>🚀 Start Game</button>
         </div>
       )}
@@ -210,16 +182,21 @@ export default function App() {
               ))}
             </div>
           </div>
-          {balls.map((ball) => (
+
+          {balls.map(ball => (
             <motion.div
               key={ball.id}
               className={`falling-item ${ball.type}`}
               style={{ left: ball.x, top: ball.y }}
               onClick={() => handleClick(ball.id, ball.type)}
-              onTouchStart={() => handleTouch(ball.id, ball.type)}
+              onTouchStart={() => handleClick(ball.id, ball.type)}
               whileTap={{ scale: 1.2 }}
             />
           ))}
+
+          {showHeartLost && (
+            <div className="heart-lost-popup">💔 You lost a heart!</div>
+          )}
         </>
       )}
 
@@ -230,29 +207,19 @@ export default function App() {
           <h3>🏆 Leaderboard</h3>
           <ul>
             {leaderboard.map((entry, idx) => (
-              <li key={idx}>
-                {entry.name} - {entry.score}
-              </li>
+              <li key={idx}>{entry.name} - {entry.score}</li>
             ))}
           </ul>
           <div className="game-over-buttons">
-            <button className="start-button btn" onClick={() => {
-              setShowInstructions(true);
-              setGameOver(false);
-            }}>Play Again</button>
-            <button className="start-button btn" onClick={() => {
-              setPlayerName('');
-              setShowInstructions(false);
-              setGameOver(false);
-            }}>Exit Game</button>
-            <button className="start-button btn share-score" onClick={handleShareScore}>Share Score</button>
+            <button className="btn" onClick={() => { setShowInstructions(true); setGameOver(false); }}>Play Again</button>
+            <button className="btn" onClick={() => { setPlayerName(''); setShowInstructions(false); setGameOver(false); }}>Exit</button>
+            <button className="btn" onClick={handleShareScore}>Share</button>
           </div>
         </div>
       )}
     </div>
   );
 }
-
 
 
 
