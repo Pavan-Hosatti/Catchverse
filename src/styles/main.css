@@ -165,16 +165,23 @@ body, html {
 /* Falling items */
 .falling-item {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 60px; /* Increased size for easier clicking */
+  height: 60px; /* Increased size for easier clicking */
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 0 10px #fff;
+  /* Add a touch action property to prevent any browser handling */
+  touch-action: none;
+  /* Ensure balls are clickable */
+  z-index: 10;
 }
 
 .falling-item.white {
   background: #ffffff;
-  box-shadow: 0 0 15px #ffffffb0;
+  box-shadow: 0 0 20px #ffffffcc;
+  /* Make white balls slightly larger for better visibility and clicking */
+  width: 65px;
+  height: 65px;
 }
 
 .falling-item.green {
@@ -308,11 +315,14 @@ button:hover, .start-button:hover {
 
 .falling-item {
   pointer-events: auto;
-  transition: transform 0.2s ease;
+  /* Add a transition for opacity to make disappearing smoother */
+  transition: opacity 0.1s ease;
 }
 
-.falling-item:hover {
-  transform: scale(1.2);
+/* Style for clicked balls */
+.falling-item.clicked {
+  opacity: 0;
+  pointer-events: none;
 }
 .heart-lost-popup {
   position: fixed;
@@ -328,6 +338,63 @@ button:hover, .start-button:hover {
   z-index: 999;
 }
 
+.level-up-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 0, 0, 0.8);
+  padding: 1.5rem 3rem;
+  border-radius: 15px;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: white;
+  animation: pulseIn 2s ease-in-out;
+  z-index: 999;
+  text-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
+  border: 5px solid yellow;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.9), 0 0 60px rgba(255, 255, 0, 0.6);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Extreme level up notification (level 5+) */
+.level-up-popup.extreme {
+  background: rgba(255, 0, 0, 0.9);
+  font-size: 2.5rem;
+  padding: 2rem 3rem;
+  border: 8px solid yellow;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 100px rgba(255, 255, 0, 0.8);
+  animation: crazyPulse 2.5s ease-in-out;
+}
+
+.level-up-popup .warning {
+  color: yellow;
+  font-size: 3rem;
+  margin-top: 10px;
+  text-shadow: 0 0 20px rgba(255, 0, 0, 1);
+  animation: blink 0.3s infinite alternate;
+}
+
+@keyframes blink {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+@keyframes crazyPulse {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.2) rotate(-5deg); }
+  10% { opacity: 1; transform: translateX(-50%) scale(1.8) rotate(5deg); }
+  20% { transform: translateX(-50%) scale(0.8) rotate(-5deg); }
+  30% { transform: translateX(-50%) scale(1.5) rotate(5deg); }
+  40% { transform: translateX(-50%) scale(0.9) rotate(-5deg); }
+  50% { transform: translateX(-50%) scale(1.3) rotate(5deg); }
+  60% { transform: translateX(-50%) scale(1) rotate(-5deg); }
+  70% { transform: translateX(-50%) scale(1.2) rotate(5deg); }
+  80% { opacity: 1; transform: translateX(-50%) scale(1) rotate(-5deg); }
+  90% { opacity: 0.8; transform: translateX(-50%) scale(1.3) rotate(5deg); }
+  100% { opacity: 0; transform: translateX(-50%) scale(2.5) rotate(-5deg); }
+}
+
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
   20% { opacity: 1; transform: translateX(-50%) scale(1); }
@@ -335,10 +402,24 @@ button:hover, .start-button:hover {
   100% { opacity: 0; transform: translateX(-50%) scale(0.8); }
 }
 
+@keyframes pulseIn {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.2); }
+  10% { opacity: 1; transform: translateX(-50%) scale(1.5); }
+  20% { transform: translateX(-50%) scale(0.8); }
+  30% { transform: translateX(-50%) scale(1.3); }
+  40% { transform: translateX(-50%) scale(0.9); }
+  50% { transform: translateX(-50%) scale(1.2); }
+  60% { transform: translateX(-50%) scale(1); }
+  70% { transform: translateX(-50%) scale(1.1); }
+  80% { opacity: 1; transform: translateX(-50%) scale(1); }
+  90% { opacity: 0.8; transform: translateX(-50%) scale(1.2); }
+  100% { opacity: 0; transform: translateX(-50%) scale(2); }
+}
+
 @media screen and (max-width: 600px) {
   .falling-item {
-    width: 40px;
-    height: 40px;
+    width: 50px; /* Larger size for mobile */
+    height: 50px; /* Larger size for mobile */
   }
 
   .score-heart-box {
@@ -529,8 +610,8 @@ button:hover, .start-button:hover {
   }
 
   .falling-item {
-    width: 35px;
-    height: 35px;
+    width: 45px; /* Still larger than original for small screens */
+    height: 45px; /* Still larger than original for small screens */
   }
 
   .score-heart-box {
