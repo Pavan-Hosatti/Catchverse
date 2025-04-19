@@ -48,18 +48,31 @@ export default function App() {
   };
 
   const startGame = () => {
+    // Cancel any existing animation frame to prevent multiple animations
+    cancelAnimationFrame(animationFrame.current);
+
+    // Reset all game state
     setScore(0);
     setLives(3);
     setBalls([]);
     setGameOver(false);
     setGameActive(true);
+
+    // Reset all refs
     ballId.current = 0;
+    spawnTimer.current = 0; // Reset spawn timer to prevent immediate ball spawning
+
     // Reset the current level
     setCurrentLevel(1);
+
     // Clear the clicked balls and heart lost balls sets when starting a new game
     clickedBalls.current.clear();
     heartLostBalls.current.clear();
-    animate();
+
+    // Start animation after a short delay to ensure clean start
+    setTimeout(() => {
+      animate();
+    }, 100);
   };
 
   const endGame = () => {
@@ -441,7 +454,11 @@ export default function App() {
             ))}
           </ul>
           <div className="game-over-buttons">
-            <button className="btn" onClick={() => { setShowInstructions(true); setGameOver(false); }}>Play Again</button>
+            <button className="btn" onClick={() => {
+              // Show instructions screen first
+              setShowInstructions(true);
+              setGameOver(false);
+            }}>Play Again</button>
             <button className="btn" onClick={() => { setPlayerName(''); setShowInstructions(false); setGameOver(false); }}>Exit</button>
             <button className="btn" onClick={handleShareScore}>Share</button>
           </div>
