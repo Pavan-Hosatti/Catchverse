@@ -210,7 +210,7 @@ export default function App() {
     if (difficultyLevel > currentLevel) {
       setCurrentLevel(difficultyLevel);
       setShowLevelUp(true);
-      setTimeout(() => setShowLevelUp(false), 1500);
+      setTimeout(() => setShowLevelUp(false), 800); // Reduced from 1500ms to 800ms
     }
 
     console.log(`[SCORE CHANGE] Score: ${score}, Level: ${difficultyLevel}, Speed Factor: ${difficultyFactor}`);
