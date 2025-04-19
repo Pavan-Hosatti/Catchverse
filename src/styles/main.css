@@ -405,7 +405,7 @@ button:hover, .start-button:hover {
   .game-over-box {
     width: 100vw;
     height: 100vh;
-    padding: 20px 15px;
+    padding: 10px 15px; /* Reduced top padding */
     background: #111;
     display: flex;
     flex-direction: column;
@@ -416,30 +416,31 @@ button:hover, .start-button:hover {
     box-shadow: 0 0 30px #ff4c4c80;
     border-radius: 15px;
     overflow: hidden;
-    gap: 10px;
+    gap: 5px; /* Reduced overall gap */
     margin: 10px;
   }
 
   .game-over-box h2 {
-    padding-top: 10px;
     font-size: 36px;
     text-align: center;
     width: 100%;
+    margin-top: 0; /* Removed top gap */
   }
 
   .game-over-box p {
     font-size: 35px;
     text-align: center;
+    margin-top: 5px; /* Reduced top gap */
   }
 
   .game-over-box h3 {
     font-size: 30px;
-    margin-bottom: 5px;
+    margin: 0; /* Removed gap */
   }
 
   .game-over-box ul {
     width: 100%;
-    max-height: 20vh; /* updated from 45vh */
+    max-height: 15vh; /* Reduced leaderboard height */
     overflow-y: auto;
     background: #222;
     border: 2px solid #ffffff33;
@@ -451,12 +452,12 @@ button:hover, .start-button:hover {
   }
 
   .game-over-buttons {
-    margin-top: auto;
+    margin-top: 15px; /* Reduced gap above buttons */
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px; /* Reduced gap between buttons */
     align-items: center;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     width: 100%;
   }
 
@@ -526,3 +527,4 @@ button:hover, .start-button:hover {
   font-size: 16px;
   margin-bottom: 5px;
 }
+
