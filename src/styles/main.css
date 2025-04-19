@@ -340,16 +340,16 @@ button:hover, .start-button:hover {
 
 .level-up-popup {
   position: fixed;
-  top: 40%;
+  top: 20%; /* Moved from 40% to 20% to be higher on screen */
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 0, 0, 0.8);
-  padding: 1.5rem 3rem;
+  background: rgba(255, 0, 0, 0.6); /* More transparent */
+  padding: 1rem 2rem; /* Smaller padding */
   border-radius: 15px;
-  font-size: 2.2rem;
+  font-size: 1.8rem; /* Smaller font */
   font-weight: bold;
   color: white;
-  animation: pulseIn 2s ease-in-out;
+  animation: pulseIn 0.8s ease-in-out; /* Reduced from 2s to 0.8s */
   z-index: 999;
   text-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
   border: 5px solid yellow;
@@ -360,17 +360,17 @@ button:hover, .start-button:hover {
 
 /* Extreme level up notification (level 5+) */
 .level-up-popup.extreme {
-  background: rgba(255, 0, 0, 0.9);
-  font-size: 2.5rem;
-  padding: 2rem 3rem;
+  background: rgba(255, 0, 0, 0.7); /* More transparent */
+  font-size: 2rem; /* Smaller font */
+  padding: 1rem 2rem; /* Smaller padding */
   border: 8px solid yellow;
   box-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 100px rgba(255, 255, 0, 0.8);
-  animation: crazyPulse 2.5s ease-in-out;
+  animation: crazyPulse 0.8s ease-in-out; /* Reduced from 2.5s to 0.8s */
 }
 
 .level-up-popup .warning {
   color: yellow;
-  font-size: 3rem;
+  font-size: 2.2rem; /* Smaller font */
   margin-top: 10px;
   text-shadow: 0 0 20px rgba(255, 0, 0, 1);
   animation: blink 0.3s infinite alternate;
@@ -382,17 +382,10 @@ button:hover, .start-button:hover {
 }
 
 @keyframes crazyPulse {
-  0% { opacity: 0; transform: translateX(-50%) scale(0.2) rotate(-5deg); }
-  10% { opacity: 1; transform: translateX(-50%) scale(1.8) rotate(5deg); }
-  20% { transform: translateX(-50%) scale(0.8) rotate(-5deg); }
-  30% { transform: translateX(-50%) scale(1.5) rotate(5deg); }
-  40% { transform: translateX(-50%) scale(0.9) rotate(-5deg); }
-  50% { transform: translateX(-50%) scale(1.3) rotate(5deg); }
-  60% { transform: translateX(-50%) scale(1) rotate(-5deg); }
-  70% { transform: translateX(-50%) scale(1.2) rotate(5deg); }
-  80% { opacity: 1; transform: translateX(-50%) scale(1) rotate(-5deg); }
-  90% { opacity: 0.8; transform: translateX(-50%) scale(1.3) rotate(5deg); }
-  100% { opacity: 0; transform: translateX(-50%) scale(2.5) rotate(-5deg); }
+  0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  20% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+  80% { opacity: 1; transform: translateX(-50%) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.2); }
 }
 
 @keyframes fadeInOut {
@@ -403,17 +396,10 @@ button:hover, .start-button:hover {
 }
 
 @keyframes pulseIn {
-  0% { opacity: 0; transform: translateX(-50%) scale(0.2); }
-  10% { opacity: 1; transform: translateX(-50%) scale(1.5); }
-  20% { transform: translateX(-50%) scale(0.8); }
-  30% { transform: translateX(-50%) scale(1.3); }
-  40% { transform: translateX(-50%) scale(0.9); }
-  50% { transform: translateX(-50%) scale(1.2); }
-  60% { transform: translateX(-50%) scale(1); }
-  70% { transform: translateX(-50%) scale(1.1); }
+  0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  20% { opacity: 1; transform: translateX(-50%) scale(1.1); }
   80% { opacity: 1; transform: translateX(-50%) scale(1); }
-  90% { opacity: 0.8; transform: translateX(-50%) scale(1.2); }
-  100% { opacity: 0; transform: translateX(-50%) scale(2); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.1); }
 }
 
 @media screen and (max-width: 600px) {
@@ -644,4 +630,5 @@ button:hover, .start-button:hover {
   font-size: 16px;
   margin-bottom: 5px;
 }
+
 
