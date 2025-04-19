@@ -48,31 +48,36 @@ export default function App() {
   };
 
   const startGame = () => {
-    // Cancel any existing animation frame to prevent multiple animations
+    // First, ensure any existing animation is canceled
     cancelAnimationFrame(animationFrame.current);
 
-    // Reset all game state
-    setScore(0);
-    setLives(3);
+    // Make sure there are no balls at all before starting
     setBalls([]);
-    setGameOver(false);
-    setGameActive(true);
 
-    // Reset all refs
-    ballId.current = 0;
-    spawnTimer.current = 0; // Reset spawn timer to prevent immediate ball spawning
-
-    // Reset the current level
-    setCurrentLevel(1);
-
-    // Clear the clicked balls and heart lost balls sets when starting a new game
-    clickedBalls.current.clear();
-    heartLostBalls.current.clear();
-
-    // Start animation after a short delay to ensure clean start
+    // Use a short timeout to ensure the balls array is empty before proceeding
     setTimeout(() => {
-      animate();
-    }, 100);
+      // Reset all game state
+      setScore(0);
+      setLives(3);
+      setGameOver(false);
+      setGameActive(true);
+
+      // Reset all refs
+      ballId.current = 0;
+      spawnTimer.current = 0; // Reset spawn timer to prevent immediate ball spawning
+
+      // Reset the current level
+      setCurrentLevel(1);
+
+      // Clear the clicked balls and heart lost balls sets
+      clickedBalls.current.clear();
+      heartLostBalls.current.clear();
+
+      // Start animation after another short delay to ensure clean start
+      setTimeout(() => {
+        animate();
+      }, 100);
+    }, 50);
   };
 
   const endGame = () => {
@@ -88,6 +93,27 @@ export default function App() {
     updated.sort((a, b) => b.score - a.score);
     setLeaderboard(updated);
     localStorage.setItem("catchverse-leaderboard", JSON.stringify(updated));
+  };
+
+  // Function to reset game state when clicking Play Again
+  const resetGame = () => {
+    // Cancel any existing animation frame
+    cancelAnimationFrame(animationFrame.current);
+
+    // Clear all balls
+    setBalls([]);
+
+    // Reset all refs
+    ballId.current = 0;
+    spawnTimer.current = 0;
+
+    // Clear all sets
+    clickedBalls.current.clear();
+    heartLostBalls.current.clear();
+
+    // Reset game state
+    setGameOver(false);
+    setShowInstructions(true);
   };
 
   const getRandomBallType = () => {
@@ -173,9 +199,21 @@ export default function App() {
     );
   };
 
+  // Cleanup animation frame when component unmounts
   useEffect(() => {
     return () => cancelAnimationFrame(animationFrame.current);
   }, []);
+
+  // Cleanup animation frame when game state changes
+  useEffect(() => {
+    if (!gameActive) {
+      cancelAnimationFrame(animationFrame.current);
+      // Also ensure balls are cleared when game is not active
+      if (!gameOver) {
+        setBalls([]);
+      }
+    }
+  }, [gameActive, gameOver]);
 
   // Add a useEffect to update the speed factor when score changes
   useEffect(() => {
@@ -454,11 +492,7 @@ export default function App() {
             ))}
           </ul>
           <div className="game-over-buttons">
-            <button className="btn" onClick={() => {
-              // Show instructions screen first
-              setShowInstructions(true);
-              setGameOver(false);
-            }}>Play Again</button>
+            <button className="btn" onClick={resetGame}>Play Again</button>
             <button className="btn" onClick={() => { setPlayerName(''); setShowInstructions(false); setGameOver(false); }}>Exit</button>
             <button className="btn" onClick={handleShareScore}>Share</button>
           </div>
