@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import './styles/main.css';
-import { motion } from 'framer-motion';
+// Removed Framer Motion import to eliminate potential animation conflicts
 
 const getRandomX = () => Math.floor(Math.random() * (window.innerWidth - 70));
 
@@ -14,13 +14,15 @@ export default function App() {
   const [nameInput, setNameInput] = useState('');
   const [leaderboard, setLeaderboard] = useState([]);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [showHeartLost, setShowHeartLost] = useState(false); // 🔥 NEW
+  const [showHeartLost, setShowHeartLost] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [currentLevel, setCurrentLevel] = useState(1);
 
   const ballId = useRef(0);
   const animationFrame = useRef();
   const spawnTimer = useRef(0);
   const speedFactor = useRef(1);
-  const [lastClickTime, setLastClickTime] = useState(0);
+  // Removed unused lastClickTime state
   const finalScore = useRef(0);
   const gameOverRef = useRef(null);
 
@@ -52,6 +54,11 @@ export default function App() {
     setGameOver(false);
     setGameActive(true);
     ballId.current = 0;
+    // Reset the current level
+    setCurrentLevel(1);
+    // Clear the clicked balls and heart lost balls sets when starting a new game
+    clickedBalls.current.clear();
+    heartLostBalls.current.clear();
     animate();
   };
 
@@ -60,6 +67,9 @@ export default function App() {
     setGameOver(true);
     cancelAnimationFrame(animationFrame.current);
     finalScore.current = score;
+
+    // Clear the clicked balls set when the game ends
+    clickedBalls.current.clear();
 
     const updated = [...leaderboard, { name: playerName, score: finalScore.current }];
     updated.sort((a, b) => b.score - a.score);
@@ -83,12 +93,40 @@ export default function App() {
     animationFrame.current = requestAnimationFrame(animate);
     spawnTimer.current += 1;
 
-    // 🔥 Adjusting speedFactor
-    const baseSpeed = 3;
-    const dynamicFactor = 0.08 * score;
-    speedFactor.current = 1 + dynamicFactor;
 
-    const spawnInterval = Math.max(15, 50 - Math.floor(score / 5) * 2);
+    // Start with a moderate base speed for easier gameplay
+    const baseSpeed = 3;
+
+    // Calculate difficulty level based on current score
+    let difficultyLevel = currentLevel;
+
+    // Calculate spawn interval based on difficulty level
+    let spawnInterval;
+
+    // EXTREME spawn rate changes after level 5
+    if (difficultyLevel <= 4) {
+      // Normal progression for levels 1-4
+      spawnInterval = Math.max(10, Math.floor(60 / Math.sqrt(difficultyLevel)));
+    } else {
+      // EXTREME spawn rate for levels 5+
+      // This will create a flood of balls at higher levels
+      spawnInterval = Math.max(5, Math.floor(20 / difficultyLevel));
+    }
+
+    // This creates the following spawn intervals:
+    // Level 1: 60 frames (slowest)
+    // Level 2: 42 frames
+    // Level 3: 35 frames
+    // Level 4: 30 frames
+    // Level 5: 5 frames - MASSIVE JUMP HERE!
+    // Level 6: 5 frames
+    // Level 7: 5 frames
+    // Level 8: 5 frames
+    // Level 9: 5 frames
+    // Level 10: 5 frames (maximum spawn rate)
+
+    // Log the spawn interval to console for debugging
+    console.log(`Score: ${score}, Difficulty Level: ${difficultyLevel}, Spawn Interval: ${spawnInterval}`);
 
     if (spawnTimer.current >= spawnInterval) {
       const type = getRandomBallType();
@@ -104,7 +142,10 @@ export default function App() {
         }))
         .filter(ball => {
           if (ball.y >= window.innerHeight) {
-            if (ball.type === 'white') {
+            if (ball.type === 'white' && !heartLostBalls.current.has(ball.id)) {
+              // Mark this ball as having caused heart loss
+              heartLostBalls.current.add(ball.id);
+
               setLives(l => {
                 const newLives = l - 1;
                 if (newLives < l) showHeartLostPopup(); // 🎉 show lost heart
@@ -123,13 +164,172 @@ export default function App() {
     return () => cancelAnimationFrame(animationFrame.current);
   }, []);
 
-  const handleClick = (id, type) => {
-    const currentTime = Date.now();
-    if (currentTime - lastClickTime < 200) return;
-    setLastClickTime(currentTime);
+  // Add a useEffect to update the speed factor when score changes
+  useEffect(() => {
+    // Calculate difficulty level based on score
+    let difficultyLevel = 1;
 
-    setBalls(prev => prev.filter(ball => ball.id !== id));
+    // Keep level 1 until score 5 for easier start
+    if (score < 5) difficultyLevel = 1;
+    else if (score >= 5 && score < 10) difficultyLevel = 2;
+    else if (score >= 10 && score < 15) difficultyLevel = 3;
+    else if (score >= 15 && score < 20) difficultyLevel = 4;
+    else if (score >= 20 && score < 25) difficultyLevel = 5;
+    else if (score >= 25 && score < 30) difficultyLevel = 6;
+    else if (score >= 30 && score < 35) difficultyLevel = 7;
+    else if (score >= 35 && score < 40) difficultyLevel = 8;
+    else if (score >= 40 && score < 45) difficultyLevel = 9;
+    else if (score >= 45) difficultyLevel = 10;
 
+    // Calculate speed factor based on difficulty level
+    let difficultyFactor;
+
+    // Level 1: No speed increase (factor = 1.0)
+    if (difficultyLevel === 1) {
+      difficultyFactor = 1.0;
+    }
+    // Levels 2-4: Moderate speed increases
+    else if (difficultyLevel <= 4) {
+      // More gradual progression for levels 2-4
+      difficultyFactor = 1.0 + ((difficultyLevel - 1) * 0.3); // +30% per level
+    }
+    // Level 5: Bigger jump but still manageable
+    else if (difficultyLevel === 5) {
+      difficultyFactor = 2.5; // 150% faster than base
+    }
+    // Levels 6+: More significant increases
+    else {
+      // Start from level 5 speed and add 50% per level
+      difficultyFactor = 2.5 + ((difficultyLevel - 5) * 0.5);
+    }
+
+    // Update the speed factor ref
+    speedFactor.current = difficultyFactor;
+
+    // Show level up notification when difficulty level changes
+    if (difficultyLevel > currentLevel) {
+      setCurrentLevel(difficultyLevel);
+      setShowLevelUp(true);
+      setTimeout(() => setShowLevelUp(false), 1500);
+    }
+
+    console.log(`[SCORE CHANGE] Score: ${score}, Level: ${difficultyLevel}, Speed Factor: ${difficultyFactor}`);
+  }, [score, currentLevel]);
+
+  // Add touch event handling for mobile devices
+  useEffect(() => {
+    // Prevent scrolling while playing
+    const handleTouchMove = (e) => {
+      if (gameActive) {
+        e.preventDefault();
+      }
+    };
+
+    // Prevent double-tap zoom on mobile
+    const handleTouchEnd = (e) => {
+      if (gameActive) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [gameActive]);
+
+  // Create a ref to track balls that have been clicked
+  const clickedBalls = useRef(new Set());
+  // Create a ref to track balls that have already caused heart loss
+  const heartLostBalls = useRef(new Set());
+  // Create a ref to track the last time we processed a click
+  const lastProcessedClick = useRef(0);
+
+  // Direct DOM event handler for ball clicks - more reliable than React's synthetic events
+  useEffect(() => {
+    if (!gameActive) return;
+
+    // Create a function to handle all click/touch events
+    const handleGlobalClick = (e) => {
+      // Only process clicks during active gameplay
+      if (!gameActive) return;
+
+      // Find the clicked element
+      const target = e.target;
+      if (!target.classList.contains('falling-item')) return;
+
+      // Get the ball ID from the data attribute
+      const ballId = parseInt(target.dataset.ballId);
+      if (isNaN(ballId)) return;
+
+      // Get the ball type from the class
+      let ballType = null;
+      if (target.classList.contains('white')) ballType = 'white';
+      else if (target.classList.contains('green')) ballType = 'green';
+      else if (target.classList.contains('red')) ballType = 'red';
+      if (!ballType) return;
+
+      // Process the click
+      processBallClick(ballId, ballType);
+
+      // For white balls, add a visual feedback by adding a 'clicked' class
+      if (ballType === 'white') {
+        target.classList.add('clicked');
+        // Also immediately hide the ball visually
+        target.style.opacity = '0';
+      }
+
+      // Prevent default behavior and stop propagation
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    // Add global click and touch handlers
+    document.addEventListener('click', handleGlobalClick, { capture: true });
+    document.addEventListener('touchstart', handleGlobalClick, { capture: true });
+
+    // Also add mousedown for even faster response
+    document.addEventListener('mousedown', handleGlobalClick, { capture: true });
+
+    return () => {
+      document.removeEventListener('click', handleGlobalClick, { capture: true });
+      document.removeEventListener('touchstart', handleGlobalClick, { capture: true });
+      document.removeEventListener('mousedown', handleGlobalClick, { capture: true });
+    };
+  }, [gameActive]);
+
+  // Separate function to process ball clicks
+  const processBallClick = (id, type) => {
+    // Implement a very short time-based debounce (20ms) - just enough to prevent double clicks
+    const now = Date.now();
+    if (now - lastProcessedClick.current < 20) return;
+    lastProcessedClick.current = now;
+
+    // If this ball has already been clicked, ignore
+    if (clickedBalls.current.has(id)) {
+      console.log(`Ball ${id} already clicked, ignoring`);
+      return;
+    }
+
+    // Mark this ball as clicked immediately
+    clickedBalls.current.add(id);
+    console.log(`Processing click on ball ${id} of type ${type}`);
+
+    // Remove the ball from state - use a callback to ensure we're working with the latest state
+    setBalls(prev => {
+      // Double-check that the ball still exists in the array
+      const ballExists = prev.some(ball => ball.id === id);
+      if (!ballExists) {
+        console.log(`Ball ${id} no longer exists in state`);
+        return prev;
+      }
+      return prev.filter(ball => ball.id !== id);
+    });
+
+    // Process the ball type effects
     if (type === 'white') {
       setScore(prev => prev + 1);
     } else if (type === 'green') {
@@ -142,6 +342,16 @@ export default function App() {
         return newLives;
       });
     }
+
+    // Clean up clicked balls set periodically
+    if (clickedBalls.current.size > 100) {
+      clickedBalls.current = new Set();
+    }
+  };
+
+  // Legacy handler for React events (as a fallback)
+  const handleClick = (id, type) => {
+    processBallClick(id, type);
   };
 
   const handleShareScore = () => {
@@ -184,18 +394,38 @@ export default function App() {
           </div>
 
           {balls.map(ball => (
-            <motion.div
+            <div
               key={ball.id}
               className={`falling-item ${ball.type}`}
               style={{ left: ball.x, top: ball.y }}
+              data-ball-id={ball.id}
               onClick={() => handleClick(ball.id, ball.type)}
               onTouchStart={() => handleClick(ball.id, ball.type)}
-              whileTap={{ scale: 1.2 }}
             />
           ))}
 
           {showHeartLost && (
             <div className="heart-lost-popup">💔 You lost a heart!</div>
+          )}
+
+          {showLevelUp && (
+            <div className={`level-up-popup ${currentLevel >= 5 ? 'extreme' : ''}`}>
+              {currentLevel >= 5 ? '💥💥💥 EXTREME ' : '🚀 '}
+              LEVEL {currentLevel}!
+              Speed {currentLevel === 1 ?
+                // Level 1: No speed increase
+                0 :
+                currentLevel <= 4 ?
+                  // Levels 2-4: +30% per level
+                  Math.round(((currentLevel - 1) * 0.3) * 100) :
+                currentLevel === 5 ?
+                  // Level 5: 150% faster
+                  150 :
+                  // Levels 6+: 150% + 50% per level above 5
+                  Math.round((2.5 + ((currentLevel - 5) * 0.5) - 1) * 100)
+              }% FASTER!
+              {currentLevel >= 5 && <div className="warning">INSANE MODE!</div>}
+            </div>
           )}
         </>
       )}
@@ -220,7 +450,6 @@ export default function App() {
     </div>
   );
 }
-
 
 
 
