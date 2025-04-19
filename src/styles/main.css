@@ -301,6 +301,27 @@ button:hover, .start-button:hover {
 .falling-item:hover {
   transform: scale(1.2);
 }
+.heart-lost-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 0, 0, 0.3);
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  color: white;
+  animation: fadeInOut 0.8s ease-in-out;
+  z-index: 999;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+  20% { opacity: 1; transform: translateX(-50%) scale(1); }
+  80% { opacity: 1; transform: translateX(-50%) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+}
+
 @media screen and (max-width: 600px) {
   .falling-item {
     width: 40px;
