@@ -48,29 +48,52 @@ export default function App() {
   };
 
   const startGame = () => {
+    // First, ensure any existing animation frame is cancelled
+    if (animationFrame.current) {
+      cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = null;
+    }
+
+    // Reset all game states
     setScore(0);
     setLives(3);
-    setBalls([]);
+    setBalls([]); // Clear all existing balls
     setGameOver(false);
-    setGameActive(true);
     ballId.current = 0;
-    // Reset the current level
+    spawnTimer.current = 0;
+    speedFactor.current = 1;
     setCurrentLevel(1);
-    // Clear the clicked balls and heart lost balls sets when starting a new game
+    
+    // Clear the sets
     clickedBalls.current.clear();
     heartLostBalls.current.clear();
-    animate();
+
+    // Add a small delay before starting the game
+    setTimeout(() => {
+      setGameActive(true);
+      animate();
+    }, 500); // 500ms delay
   };
 
   const endGame = () => {
+    // Cancel animation frame immediately
+    if (animationFrame.current) {
+      cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = null;
+    }
+
     setGameActive(false);
     setGameOver(true);
-    cancelAnimationFrame(animationFrame.current);
     finalScore.current = score;
 
-    // Clear the clicked balls set when the game ends
+    // Clear all balls
+    setBalls([]);
+    
+    // Clear the sets
     clickedBalls.current.clear();
+    heartLostBalls.current.clear();
 
+    // Update leaderboard
     const updated = [...leaderboard, { name: playerName, score: finalScore.current }];
     updated.sort((a, b) => b.score - a.score);
     setLeaderboard(updated);
@@ -90,9 +113,20 @@ export default function App() {
   };
 
   const animate = () => {
-    animationFrame.current = requestAnimationFrame(animate);
-    spawnTimer.current += 1;
+    // Cancel any existing animation frame first
+    if (animationFrame.current) {
+      cancelAnimationFrame(animationFrame.current);
+    }
 
+    animationFrame.current = requestAnimationFrame(animate);
+    
+    // Add a guard clause to prevent animation if game is not active
+    if (!gameActive) {
+      cancelAnimationFrame(animationFrame.current);
+      return;
+    }
+
+    spawnTimer.current += 1;
 
     // Start with a moderate base speed for easier gameplay
     const baseSpeed = 3;
@@ -109,28 +143,21 @@ export default function App() {
       spawnInterval = Math.max(10, Math.floor(60 / Math.sqrt(difficultyLevel)));
     } else {
       // EXTREME spawn rate for levels 5+
-      // This will create a flood of balls at higher levels
       spawnInterval = Math.max(5, Math.floor(20 / difficultyLevel));
     }
 
-    // This creates the following spawn intervals:
-    // Level 1: 60 frames (slowest)
-    // Level 2: 42 frames
-    // Level 3: 35 frames
-    // Level 4: 30 frames
-    // Level 5: 5 frames - MASSIVE JUMP HERE!
-    // Level 6: 5 frames
-    // Level 7: 5 frames
-    // Level 8: 5 frames
-    // Level 9: 5 frames
-    // Level 10: 5 frames (maximum spawn rate)
-
-    // Log the spawn interval to console for debugging
-    console.log(`Score: ${score}, Difficulty Level: ${difficultyLevel}, Spawn Interval: ${spawnInterval}`);
+    // Add a spawn rate limiter
+    const maxBallsOnScreen = 15; // Adjust this number as needed
 
     if (spawnTimer.current >= spawnInterval) {
-      const type = getRandomBallType();
-      setBalls(prev => [...prev, { id: ballId.current++, x: getRandomX(), y: 0, type }]);
+      // Only spawn new balls if we're under the limit
+      setBalls(prev => {
+        if (prev.length < maxBallsOnScreen) {
+          const type = getRandomBallType();
+          return [...prev, { id: ballId.current++, x: getRandomX(), y: 0, type }];
+        }
+        return prev;
+      });
       spawnTimer.current = 0;
     }
 
@@ -143,12 +170,10 @@ export default function App() {
         .filter(ball => {
           if (ball.y >= window.innerHeight) {
             if (ball.type === 'white' && !heartLostBalls.current.has(ball.id)) {
-              // Mark this ball as having caused heart loss
               heartLostBalls.current.add(ball.id);
-
               setLives(l => {
                 const newLives = l - 1;
-                if (newLives < l) showHeartLostPopup(); // 🎉 show lost heart
+                if (newLives < l) showHeartLostPopup();
                 if (newLives <= 0) endGame();
                 return newLives;
               });
