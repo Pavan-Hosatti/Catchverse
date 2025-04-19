@@ -17,6 +17,7 @@ export default function App() {
   const [showHeartLost, setShowHeartLost] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
+  const [canSpawnBalls, setCanSpawnBalls] = useState(false);
 
   const ballId = useRef(0);
   const animationFrame = useRef();
@@ -51,36 +52,42 @@ export default function App() {
     // First, ensure any existing animation is canceled
     cancelAnimationFrame(animationFrame.current);
 
+    // Disable ball spawning immediately
+    setCanSpawnBalls(false);
+
     // Make sure there are no balls at all before starting
     setBalls([]);
 
-    // Use a short timeout to ensure the balls array is empty before proceeding
+    // Reset all game state
+    setScore(0);
+    setLives(3);
+    setGameOver(false);
+    setGameActive(true);
+
+    // Reset all refs
+    ballId.current = 0;
+    spawnTimer.current = 0; // Reset spawn timer to prevent immediate ball spawning
+
+    // Reset the current level
+    setCurrentLevel(1);
+
+    // Clear the clicked balls and heart lost balls sets
+    clickedBalls.current.clear();
+    heartLostBalls.current.clear();
+
+    // Start animation immediately but without spawning balls
+    animate();
+
+    // Enable ball spawning after a delay to ensure a clean start
     setTimeout(() => {
-      // Reset all game state
-      setScore(0);
-      setLives(3);
-      setGameOver(false);
-      setGameActive(true);
-
-      // Reset all refs
-      ballId.current = 0;
-      spawnTimer.current = 0; // Reset spawn timer to prevent immediate ball spawning
-
-      // Reset the current level
-      setCurrentLevel(1);
-
-      // Clear the clicked balls and heart lost balls sets
-      clickedBalls.current.clear();
-      heartLostBalls.current.clear();
-
-      // Start animation after another short delay to ensure clean start
-      setTimeout(() => {
-        animate();
-      }, 100);
-    }, 50);
+      setCanSpawnBalls(true);
+    }, 500);
   };
 
   const endGame = () => {
+    // Disable ball spawning immediately
+    setCanSpawnBalls(false);
+
     setGameActive(false);
     setGameOver(true);
     cancelAnimationFrame(animationFrame.current);
@@ -100,20 +107,26 @@ export default function App() {
     // Cancel any existing animation frame
     cancelAnimationFrame(animationFrame.current);
 
-    // Clear all balls
-    setBalls([]);
+    // Disable ball spawning immediately
+    setCanSpawnBalls(false);
 
-    // Reset all refs
-    ballId.current = 0;
-    spawnTimer.current = 0;
+    // Clear all balls with a small delay to ensure React has time to process
+    setTimeout(() => {
+      // Clear all balls
+      setBalls([]);
 
-    // Clear all sets
-    clickedBalls.current.clear();
-    heartLostBalls.current.clear();
+      // Reset all refs
+      ballId.current = 0;
+      spawnTimer.current = 0;
 
-    // Reset game state
-    setGameOver(false);
-    setShowInstructions(true);
+      // Clear all sets
+      clickedBalls.current.clear();
+      heartLostBalls.current.clear();
+
+      // Reset game state
+      setGameOver(false);
+      setShowInstructions(true);
+    }, 50);
   };
 
   const getRandomBallType = () => {
@@ -167,7 +180,8 @@ export default function App() {
     // Log the spawn interval to console for debugging
     console.log(`Score: ${score}, Difficulty Level: ${difficultyLevel}, Spawn Interval: ${spawnInterval}`);
 
-    if (spawnTimer.current >= spawnInterval) {
+    // Only spawn balls if the canSpawnBalls flag is true
+    if (canSpawnBalls && spawnTimer.current >= spawnInterval) {
       const type = getRandomBallType();
       setBalls(prev => [...prev, { id: ballId.current++, x: getRandomX(), y: 0, type }]);
       spawnTimer.current = 0;
@@ -501,6 +515,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
