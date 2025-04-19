@@ -350,7 +350,7 @@ button:hover, .start-button:hover {
   font-weight: bold;
   color: white;
   animation: pulseIn 0.2s ease-in-out; /* Reduced from 2s to 0.8s */
-  z-index: -999;
+  z-index: 999;
   text-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
   border: 5px solid yellow;
   box-shadow: 0 0 20px rgba(255, 0, 0, 0.9), 0 0 40px rgba(255, 255, 0, 0.6);
