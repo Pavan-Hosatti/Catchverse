@@ -111,29 +111,28 @@ export default function App() {
 
   // Function to reset game state when clicking Play Again
   const resetGame = () => {
+    console.log('Resetting game...');
+
     // Cancel any existing animation frame
     cancelAnimationFrame(animationFrame.current);
 
-    // Disable ball spawning immediately
-    setCanSpawnBalls(false);
+    // Clear all balls immediately
+    setBalls([]);
 
-    // Clear all balls with a small delay to ensure React has time to process
-    setTimeout(() => {
-      // Clear all balls
-      setBalls([]);
+    // Reset all refs
+    ballId.current = 0;
+    spawnTimer.current = 0;
 
-      // Reset all refs
-      ballId.current = 0;
-      spawnTimer.current = 0;
+    // Clear all sets
+    clickedBalls.current.clear();
+    heartLostBalls.current.clear();
 
-      // Clear all sets
-      clickedBalls.current.clear();
-      heartLostBalls.current.clear();
+    // Reset game state
+    setGameOver(false);
+    setShowInstructions(true);
 
-      // Reset game state
-      setGameOver(false);
-      setShowInstructions(true);
-    }, 50);
+    // Make sure canSpawnBalls is true for the next game start
+    setCanSpawnBalls(true);
   };
 
   const getRandomBallType = () => {
@@ -165,6 +164,12 @@ export default function App() {
 
     // Debug logging
     console.log(`Animation frame: Score=${score}, Level=${currentLevel}, CanSpawn=${canSpawnBalls}, Timer=${spawnTimer.current}, Interval=${spawnInterval}`);
+
+    // If we're in active gameplay but canSpawnBalls is false, enable it
+    if (gameActive && !canSpawnBalls) {
+      console.log('Game is active but canSpawnBalls is false, enabling it');
+      setCanSpawnBalls(true);
+    }
 
     // Spawn new balls if allowed and timer reached interval
     if (canSpawnBalls && spawnTimer.current >= spawnInterval) {
@@ -221,7 +226,12 @@ export default function App() {
 
   // Cleanup animation frame when game state changes
   useEffect(() => {
-    if (!gameActive) {
+    if (gameActive) {
+      // When game becomes active, ensure ball spawning is enabled
+      console.log('Game became active, ensuring ball spawning is enabled');
+      setCanSpawnBalls(true);
+    } else {
+      // When game becomes inactive
       cancelAnimationFrame(animationFrame.current);
       // Also ensure balls are cleared when game is not active
       if (!gameOver) {
@@ -521,6 +531,8 @@ export default function App() {
     </div>
   );
 }
+
+
 
 
 
